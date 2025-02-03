@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run Tests in Kubernetes
 
 on:
   push:
@@ -16,15 +16,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set Up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+      - name: Set Up Kubernetes CLI
+        uses: azure/setup-kubectl@v3
 
-      - name: Set Up Gradle
-        uses: gradle/gradle-build-action@v2
+      - name: Apply Kubernetes Pod Configuration
+        run: kubectl apply -f KubernetesPod.yaml
 
-      - name: Run Tests
+      - name: Wait for Pod to Be Ready
         run: |
-          ./gradlew test
+          kubectl wait --for=condition=ready pod -l app=gradle --timeout=300s
+
+      - name: Run Tests Inside the Pod
+        run: |
+          kubectl exec -it $(kubectl get pod -l app=gradle -o jsonpath="{.items[0].metadata.name}") -- ./gradlew test
+
+      - name: Cleanup Kubernetes Pod
+        if: always()
+        run: kubectl delete -f KubernetesPod.yaml
