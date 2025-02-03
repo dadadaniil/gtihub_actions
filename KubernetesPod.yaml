@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Pod
+spec:
+  volumes:
+    - name: md-rest-configmap
+      configMap:
+        name: md-rest-configmap
+        items:
+          - key: redisson.yaml
+            path: redisson.yaml
+  containers:
+    - name: gradle
+      image: gradle:7.4.1-jdk17
+      volumeMounts:
+        - name: md-rest-configmap
+          mountPath: /app/config/
+      envFrom:
+        - configMapRef:
+            name: md-rest-configmap
+      command:
+        - sleep
+      args:
+        - 9999999
+      env:
+        - name: MASTERDATA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: MASTERDATA_DB_PASSWORD
+        - name: MOVILIZER_AUTHORITY-CLIENT_BASIC-AUTH-USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: MOVILIZER_AUTHORITY-CLIENT_BASIC-AUTH-USERNAME
+        - name: MOVILIZER_AUTHORITY-CLIENT_BASIC-AUTH-PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: MOVILIZER_AUTHORITY-CLIENT_BASIC-AUTH-PASSWORD
+        - name: BLOCK_FOR_DESTRUCTION_BASIC_AUTH_USER
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: BLOCK_FOR_DESTRUCTION_BASIC_AUTH_USER
+        - name: BLOCK_FOR_DESTRUCTION_BASIC_AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: BLOCK_FOR_DESTRUCTION_BASIC_AUTH_PASSWORD
+        - name: MASTERDATA_BASIC_AUTH_USER
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: MASTERDATA_BASIC_AUTH_USER
+        - name: MASTERDATA_BASIC_AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: MASTERDATA_BASIC_AUTH_PASSWORD
+        - name: WORKFLOW_SERVICE_BASIC_AUTH_USER
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: WORKFLOW_SERVICE_BASIC_AUTH_USER
+        - name: WORKFLOW_SERVICE_BASIC_AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: WORKFLOW_SERVICE_BASIC_AUTH_PASSWORD
+        - name: SERIALIZATION_ENGINE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: SERIALIZATION_ENGINE_USERNAME
+        - name: SERIALIZATION_ENGINE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: md-v6-secrets
+              key: SERIALIZATION_ENGINE_PASSWORD
+        - name: MOVILIZER_SPRING-AUTHENTICATION-SERVICE_USER_BASIC-AUTH-USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: technical-user-secret
+              key: TECHNICAL_USER_BASIC_AUTH_USER
+        - name: MOVILIZER_SPRING-AUTHENTICATION-SERVICE_USER_BASIC-AUTH-PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: technical-user-secret
+              key: TECHNICAL_USER_BASIC_AUTH_PASSWORD
